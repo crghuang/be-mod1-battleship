@@ -28,15 +28,20 @@ class Game
     @boards[:computer] = Board.new
     @boards[:player] = Board.new
 
-    cruiser = Ship.new("Cruiser", 3)
-    submarine = Ship.new("Submarine", 2)
+    ships = [
+      Ship.new("Cruiser", 3),
+      Ship.new("Submarine", 2)
+    ]
 
-    set_up_computer_board([cruiser, submarine])
+    set_up_computer_board(ships)
 
     puts "\nI have laid out my ships on the grid.\n" +
     "You now need to lay out your two ships.\n" + 
     "The Cruiser is three units long and the Submarine is two units long."
     @boards[:player].render
+
+    ships.each { |ship| place_ship(@boards[:player], ship) }
+    require 'pry'; binding.pry
   end
 
   def set_up_computer_board(ships)
@@ -77,7 +82,7 @@ class Game
   def place_ship(board, ship)
     coordinates = []
 
-    puts "\nEnter the squares for the " + ship.name +  " (" + ship.length + " spaces):"
+    puts "\nEnter the squares for the " + ship.name +  " (" + ship.length.to_s + " spaces):"
     loop do
       coordinates = gets.chomp.split("\s")
       break if board.valid_placement?(ship, coordinates)
