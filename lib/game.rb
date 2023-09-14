@@ -33,7 +33,7 @@ class Game
       Ship.new("Submarine", 2)
     ]
 
-    set_up_computer_board(ships)
+    set_up_computer_board([Ship.new("Cruiser", 3), Ship.new("Submarine", 2)])
 
     puts "\nI have laid out my ships on the grid.\n" +
     "You now need to lay out your two ships.\n" + 
