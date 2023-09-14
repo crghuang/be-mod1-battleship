@@ -60,7 +60,7 @@ class Board
       if i == 0
         display << "  "
       else
-        row = (i + 64).chr() # 64 offset to ASCII A
+        row = (i + 64).chr # 64 offset to ASCII A
         display << row << " "
       end
 
