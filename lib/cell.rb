@@ -22,7 +22,7 @@ class Cell
   end
 
   def place_ship(ship)
-    if @ship == nil
+    if empty? # @ship == nil
       @ship = ship
     end
   end
