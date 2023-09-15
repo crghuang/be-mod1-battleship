@@ -1,9 +1,13 @@
 
 class Game
   attr_reader :boards
+              :ships
+              :winner
 
   def initialize()
     @boards = {}
+    @ships = {}
+    @winner
     start_game
   end
 
@@ -28,20 +32,24 @@ class Game
     @boards[:computer] = Board.new
     @boards[:player] = Board.new
 
-    ships = [
+    @ships[:player] = [
       Ship.new("Cruiser", 3),
       Ship.new("Submarine", 2)
     ]
 
-    set_up_computer_board([Ship.new("Cruiser", 3), Ship.new("Submarine", 2)])
+    @ships[:computer] = [
+      Ship.new("Cruiser", 3),
+      Ship.new("Submarine", 2)
+    ]
+
+    set_up_computer_board(@ships[:computer])
 
     puts "\nI have laid out my ships on the grid.\n" +
     "You now need to lay out your two ships.\n" + 
     "The Cruiser is three units long and the Submarine is two units long."
     @boards[:player].render
 
-    ships.each { |ship| place_ship(@boards[:player], ship) }
-    require 'pry'; binding.pry
+    @ships[:player].each { |ship| place_ship(@boards[:player], ship) }
   end
 
   def set_up_computer_board(ships)
@@ -92,6 +100,85 @@ class Game
     board.render(true)
   end
 
+  def play_game
+    loop do
+      turn
+      break if game_over?
+    end
+    display_winner
+    start_game
+  end
+
+  def render_boards
+    puts "\n=============COMPUTER BOARD============="
+    @boards[:computer].render
+    puts "\n==============PLAYER BOARD=============="
+    @boards[:player].render(true)
+  end
+
+  def turn
+    render_boards
+    player_turn
+    computer_turn
+  end
+
+  def player_turn
+    puts "\nEnter the coordinate for your shot:"
+    coordinate = ""
+    loop do
+      coordinate = gets.chomp
+      break if @boards[:computer].valid_coordinate?(coordinate)
+      puts "Please enter a valid coordinate:"
+    end
+    @boards[:computer].cells[coordinate].fire_upon
+    report_shot_result(:computer, coordinate)
+  end
+
+  def computer_turn
+    coordinate = ""
+    loop do
+      index = rand(@boards[:player].height * @boards[:player].width)
+      coordinate = (index/4.floor + 1 + 64).chr + (index % 4).to_s
+      break if !@boards[:player].cells[coordinate].fired_upon?
+    end
+    @boards[:player].cells[coordinate].fire_upon
+    report_shot_result(:player, coordinate)
+  end
+
+  def report_shot_result(player, coordinate)
+    who = player == :player ? "My" : "Your"
+    case @boards[player].cells[coordinate].render
+    when "X"
+      puts who + " shot on " + coordinate + " sunk a ship."
+    when "H"
+      puts who + " shot on " + coordinate + " was a hit."
+    when "M"
+      puts who + " shot on " + coordinate + " was a miss."
+    else
+      puts "Error! Invalid player turn result!"
+    end
+  end
+
   def game_over?
+    @ships.each_value do |ary|
+      return true if overall_health(ary) == 0
+    end
+    false
+  end
+
+  def overall_health(ships)
+    health = 0
+    ships.each { |ship| health += ship.health }
+    health
+  end
+
+  def display_winner
+    @ships.each do |player, ary|
+      if overall_health(ary) > 0
+        who = player == :player ? "You" : "I"
+        puts who + " won!"
+        return
+      end
+    end
   end
 end
