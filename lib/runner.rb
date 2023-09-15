@@ -2,4 +2,6 @@ require './spec/spec_helper'
 
 game = Game.new
 
-game.play_game
+while true
+  game.play_game
+end

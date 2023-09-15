@@ -138,7 +138,7 @@ class Game
     coordinate = ""
     loop do
       index = rand(@boards[:player].height * @boards[:player].width)
-      coordinate = (index/4.floor + 1 + 64).chr + (index % 4).to_s
+      coordinate = (index/4.floor + 1 + 64).chr + (index % 4 + 1).to_s
       break if !@boards[:player].cells[coordinate].fired_upon?
     end
     @boards[:player].cells[coordinate].fire_upon
@@ -176,7 +176,7 @@ class Game
     @ships.each do |player, ary|
       if overall_health(ary) > 0
         who = player == :player ? "You" : "I"
-        puts who + " won!"
+        puts who + " won!\n"
         return
       end
     end
